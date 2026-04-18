@@ -1,0 +1,25 @@
+[Unit]
+Description=Apex BTC Spot Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=apex
+WorkingDirectory=/opt/apex-btc-agent
+EnvironmentFile=/opt/apex-btc-agent/.env
+ExecStart=/opt/apex-btc-agent/.venv/bin/python /opt/apex-btc-agent/apex_btc_agent.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/apex-btc-agent.log
+StandardError=append:/var/log/apex-btc-agent.log
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/apex-btc-agent /var/log
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

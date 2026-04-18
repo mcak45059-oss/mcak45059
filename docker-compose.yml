@@ -1,0 +1,13 @@
+services:
+  apex:
+    build: .
+    container_name: apex-btc-agent
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./data:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
