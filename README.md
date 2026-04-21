@@ -1,3 +1,12 @@
+# mcak45059 — Agent Collection
+
+Two independent agents in one repo:
+
+1. **Apex BTC Spot Agent** — automated BTC/USDT trading on Binance Spot.
+2. **Video Script Agent** — Telegram bot that writes short-film / reel scripts in your personal voice, powered by Claude.
+
+---
+
 # Apex BTC Spot Agent
 
 Automated BTC/USDT trading bot for Binance Spot.
@@ -194,3 +203,60 @@ sudo journalctl -u apex-btc-agent -f
 | `docker-compose.yml` | One-command deploy |
 | `apex-btc-agent.service` | systemd unit |
 | `btc_agent_state.json` | Runtime state (auto-created, gitignored) |
+
+---
+
+# Video Script Agent
+
+Telegram bot that ghost-writes short-film and reel scripts in your personal voice.
+Reads `style_guide.md` and every file in `samples/` at startup and feeds them to Claude
+as a style reference, so every output reads like the same human wrote it.
+
+## Quick start
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env
+# edit .env — set ANTHROPIC_API_KEY and TELEGRAM_BOT_TOKEN (at minimum)
+python3 video_script_agent.py
+```
+
+## Telegram commands
+
+| Command | What it does |
+|---------|-------------|
+| `/start` or `/help` | Show welcome + usage |
+| `/reel <idea>` | 30–60s vertical reel (shooting script format) |
+| `/short <idea>` | 2–3min short (shooting script with timecodes + SFX / MUSIC markers) |
+| `/film <idea>` | 5–10min screenplay (INT./EXT., V.O., optional themes block) |
+| `/style` | List currently loaded style guide + sample files |
+| `/reload` | Re-read `style_guide.md` + `samples/` from disk (after you edit them) |
+| *plain text* | Agent picks a format based on your description |
+
+## Customizing the voice
+
+- **`style_guide.md`** — the writer's DNA. Edit it any time to add new rules, remove
+  AI-tell phrases, or shift tone. Changes take effect on `/reload` or restart.
+- **`samples/`** — verbatim scripts you've written. Drop new `.md` or `.txt` files here
+  as few-shot examples. More good samples = stronger voice match.
+
+## Config (`.env`)
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ANTHROPIC_API_KEY` | (required) | Claude API key |
+| `TELEGRAM_BOT_TOKEN` | (required) | From @BotFather |
+| `TELEGRAM_CHAT_ID` | (optional) | Restrict bot to this single chat ID |
+| `CLAUDE_MODEL` | `claude-sonnet-4-6` | Any current Claude model |
+| `MAX_TOKENS` | `8000` | Generation cap (enough for ~10min screenplay) |
+| `TEMPERATURE` | `0.9` | Higher = more variation, lower = more faithful to samples |
+| `SAMPLES_DIR` | `samples` | Directory of sample scripts |
+| `STYLE_GUIDE` | `style_guide.md` | Path to the style DNA file |
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `video_script_agent.py` | Main Telegram bot |
+| `style_guide.md` | Style DNA — edit to shape the voice |
+| `samples/` | Verbatim sample scripts used as few-shot reference |
